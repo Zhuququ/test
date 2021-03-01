@@ -1,0 +1,14 @@
+@Controller：用于标注控制层组件。
+@RestController:相当于 @Controller和@ResponseBody的组合效果。
+@Component:泛指组件，当组件不好归类的时候，可以使用该注解。
+@Repository:用于注解Dao层。
+@Service：用于标注业务层组件。
+@ResponseBody:异步请求。用于将Controller的方法返回的对象，通过适当的HttpMessageConverter转换为指定格式后，写入到Response对象的body数据区。
+				返回的数据不是html标签的页面，而是其他某种格式的数据时（JSON、XML等）使用。
+@RequestMapping:一个用来处理请求地址映射的注解，可用于类或方法上，用于类上，表示类中所有响应请求的方法都是以该地址作为父路径。
+@Autowired：可用对类成员变量、方法及构造函数进行标注，完成自动装配的工作，通过该注解来消除get、set方法。
+@PathVariable:用于将请求URL中的模板变量映射到功能处理方法的参数上，即取出url模板中的变量作为参数。
+				/deleteBook/1
+@RequestParam：主要用于SpringMVC后台控制层获取参数，类似于request.getParameter("name")。
+				/deleteBook?id=1
+@RequestHeader:可以把Request请求header部分的值绑定到放到的参数上。
