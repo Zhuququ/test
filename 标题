@@ -1,0 +1,151 @@
+1.Error和Exception的区别
+2.异常的处理方式
+3.throw和throws的区别
+4.反射的基本概念
+5.反射的步骤
+6.获取class对象的方法
+7.创建对象的方法
+8.4种标准元注解
+9.Java内部类
+10.Java复制
+11.线程的实现/创建
+12.四种线程池
+13.线程的生命周期
+14.线程的三种阻塞状态
+15.终止线程的方式
+16.线程的三种死亡方式
+17.sleep和wait的区别
+18.start和run的区别
+19.Java后台线程的概念
+20.网络的七层架构
+21.TCP/IP原理
+22.三次握手
+23.四次挥手
+24.为什么断开要四次
+25.为什么TIME-WAIT状态要等待2MSL才能返回到CLOSE状态
+26.为什么不能两次握手
+27.Spring特点
+28.Spring Bean作用域
+29.Spring Bean生命周期
+30.Spring依赖注入方式
+31.五种不同的自动装配
+32.AOP的运用场景
+33.AOP的核心概念
+34.SpringMVC流程
+35.SpringBoot特性
+36.事务的作用
+37.Mybatis一级缓存的原理
+38.Mybatis二级缓存的原理
+Java的三大特性
+JDK和JRE的区别
+Java基本数据类型及封装类
+public static void main(String args[])这段声明中每个关键字的作用
+==与equals的区别
+float f = 3.4; 是否正确
+short s1 = 1； s1 = s1 + 1; 有错吗
+final、finally、finalize的区别和用法
+hashCode和equals的区别
+Java中操作字符串的类，以及区别
+String str = "a"和String str = new String("a")一样吗
+final能修饰抽象类吗
+抽象的方法可以同时静态吗
+是否可以从一个静态方法内部发出对非静态方法的调用
+static可以修饰局部变量吗
+内部类和静态内部类的区别
+重载和重写
+如果有些字段不想序列化
+Java中Comparator与Comparable的不同
+Collection和Collections的区别
+List、Set、Map是否继承自Collection接口
+Collections.sort排序的内部原理
+List、Set、Map的区别
+HashMap和HashTable的区别
+HashMap的实现原理
+HashSet的实现原理
+ArrayList和LinkedList的区别
+ArrayList和Vector区别
+Array和ArrayList的区别
+Queue中poll方法和remove方法的区别
+LinkedHashMap有什么特点
+HashMap的多线程问题
+什么时候会抛出StackOverflowError
+什么情况下会出现堆内存溢出
+除了哪个区域外，虚拟机内存其他运行时区域都会发生OutOfMemoryError
+空间什么情况下会抛出OutOfMemoryError
+垃圾标记阶段
+标记的两种方法
+三种常见的垃圾收集算法
+垃圾收集器
+三范式
+NULL和空串（SQL方面）
+事务的特性
+为什么设置主键
+字段为什么建议设为not null
+视图是什么，优势有哪些
+Spring特点
+Spring Bean作用域
+Spring Bean生命周期
+Spring 依赖注入的四种方式
+五种不同方式的自动装配
+AOP主要应用场景
+AOP核心概念
+Spring MVC流程
+Spring Boot的特性
+@Value("${}")和@Value("#{}")的区别
+映射Web请求的注解
+控制器需要返回json或者xml时，使用哪个注解
+@Controller+@ResponseBody相当于哪个注解
+接收路径参数的注解
+@Qualifier注解
+Mybatis缓存
+Mybatis一级缓存的原理
+Mybaits二级缓存的原理
+Mybatis的优缺点
+Mybaits中#{}和${}的区别
+Mybatis的动态标签
+Mybatis XML映射文件中有哪些标签
+如何获取自增主键
+当实体类属性名和表字段名不一致，怎么办
+模糊查询
+nginx主要特征
+nginx负载均衡几种模式/算法
+nginx的进程模型
+nginx负载均衡实现过程
+Redis是什么
+Redis特性
+Redis合适的应用场景
+Redis的数据类型
+Redis的高级功能
+Dubbo
+SpringBoot启动类注解
+SpringBoot支持的配置文件的格式
+SpringBoot修改端口号
+什么是Spring Profiles
+SpringBoot异常处理的相关注解
+网络七层架构
+TCP/IP原理
+TCP三次握手/四次挥手
+为什么断开要四次，而连接只要三次
+为什么TIME-WAIT状态需要经过2MSL才能返回到CLOSE状态
+为什么不能用两次握手
+线程的实现/创建
+四种线程池
+线程的生命周期
+线程的三种阻塞状态
+线程的三种死亡方式
+终止线程的四种方式
+sleep与wait区别
+start和run区别
+JAVA后台线程
+Error/Exception
+异常的处理方式
+throw和throws的区别
+反射
+反射的应用场合
+反射API
+反射使用步骤
+获取Class对象的3种方法
+创建对象的两种方法
+4种标准元注解
+Java内部类
+Java复制
