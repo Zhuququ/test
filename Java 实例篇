@@ -1,0 +1,285 @@
+一、生产者-消费者
+	①synchronized
+	public class MyContainer1<T> {
+		final private LinkedList<T> lists = new LinkedList<>();
+		final private int MAX = 10; // 最多10个元素
+		private int count = 0;
+
+		public synchronized void put(T t) {
+			while (lists.size() == MAX) { // 阻塞后，被唤醒时，会再次判断一下容器中的个数
+				try {
+					this.wait(); // effective java
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			System.out.println(Thread.currentThread().getName() + "生产：" + t);
+			lists.add(t);
+			++count;
+			this.notifyAll(); // 通知消费者线程进行消费
+		}
+
+		public synchronized T get() {
+			T t = null;
+			while (lists.size() == 0) {
+				try {
+					this.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			t = lists.removeFirst();
+			System.out.println(Thread.currentThread().getName() + "消费：" + t);
+			count--;
+			this.notifyAll(); // 通知生产者进行生产
+			return t;
+		}
+
+		public static void main(String[] args) {
+			MyContainer1<String> c = new MyContainer1<>();
+			// 启动消费者线程
+			for (int i = 0; i < 10; i++) {
+				new Thread(() -> {
+					for (int j = 0; j < 5; j++)
+						c.get();
+				}, "c" + i).start();
+			}
+
+			try {
+				TimeUnit.SECONDS.sleep(2);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			// 启动生产者线程
+			for (int i = 0; i < 2; i++) {
+				new Thread(() -> {
+					for (int j = 0; j < 25; j++)
+						c.put(j + "");
+				}, "p" + i).start();
+			}
+		}
+	}
+	②ReentrantLock和Condition
+	public class ReentrantLock4 {
+		private final static int MAX = 10;
+		private LinkedList<Integer> list = new LinkedList<>();
+
+		public int size() {
+			return list.size();
+		}
+
+		public void put() {
+			list.add(1);
+		}
+
+		public void get() {
+			list.removeFirst();
+		}
+
+		public static void main(String args[]) {
+			ReentrantLock4 rl = new ReentrantLock4();
+			Lock lock = new ReentrantLock();
+			Condition con = lock.newCondition();
+
+			for (int i = 0; i < 2; i++) {
+				// 生产者
+				new Thread(() -> {
+					lock.lock();
+					try {
+						for (int j = 0; j < 25; j++) {
+							while (rl.size() == MAX) {
+								try {
+									con.await(); // 生产到最大件时，阻塞当前线程
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+							rl.put();
+							System.out.println(Thread.currentThread().getName() + "生产一件，当前有" + rl.size() + "件");
+							con.signal(); // 通知其他线程可以消费
+							try {
+								TimeUnit.SECONDS.sleep(1);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+					} finally {
+						lock.unlock(); // 最后记得释放锁
+					}
+				}, "producer" + i).start();
+			}
+
+			try {
+				TimeUnit.SECONDS.sleep(2);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+
+			for (int i = 0; i < 10; i++) {
+				// 消费者
+				new Thread(() -> {
+					lock.lock();
+					try {
+						for (int j = 0; j < 5; j++) {
+							while (rl.size() == 0) {
+								try {
+									con.await(); // 没有件数时，阻塞当前线程
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+							}
+							rl.get();
+							System.out.println(Thread.currentThread().getName() + "消费一件，当前有" + rl.size() + "件");
+							con.signal();
+							try {
+								TimeUnit.SECONDS.sleep(1);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+					} finally {
+						lock.unlock();
+					}
+				}, "consumer" + i).start();
+			}
+		}
+	}
+	③BlockingQueue
+	
+
+二、ReentrantLock-tryLock
+	public class ReentrantLock3 {
+		Lock lock = new ReentrantLock();
+
+		void m1() {
+			try {
+				System.out.println(Thread.currentThread().getName() + " start");
+				lock.lock();
+				for (int i = 0; i < 10; i++) {
+					TimeUnit.SECONDS.sleep(1);
+					System.out.println(i);
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} finally {
+				lock.unlock();
+			}
+		}
+
+		/**
+		 * 使用tryLock进行尝试锁定，不管锁定与否，方法都将继续执行 可以根据tryLock的返回值来判定是否锁定
+		 * 也可以指定tryLock的时间，由于tryLock(time)抛出异常，所以要注意unclock的处理，必须放到finally中
+		 */
+		void m2() {
+			System.out.println(Thread.currentThread().getName() + " start");
+
+			boolean locked = false;
+
+			try {
+				locked = lock.tryLock(5, TimeUnit.SECONDS);// 尝试获取到锁，5秒后还没获取到则返回false
+				System.out.println("m2 ..." + locked);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} finally {
+				if (locked)
+					lock.unlock();
+			}
+		}
+
+		public static void main(String[] args) {
+			ReentrantLock3 rl = new ReentrantLock3();
+			new Thread(rl::m1).start();
+			try {
+				TimeUnit.SECONDS.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			new Thread(rl::m2).start();
+		}
+	}
+
+三、CountDownLatch（应用场景：并行运算）
+通过计数来保证线程是否需要一直阻塞
+
+例：实现一个容器，提供两个方法，add，size，写两个线程，线程1添加10个元素到容器中，线程2实现监控元素的个数，当个数到5个时，线程2给出提示并结束。
+public class CountDownLatchExample1 {
+    volatile List list = new ArrayList();
+    public void add(Object o) {
+        list.add(o);
+    }
+    public int size() {
+        return list.size();
+    }
+
+    public static void main(String[] args) throws Exception {
+        CountDownLatchExample1 container = new CountDownLatchExample1();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        new Thread(() -> {
+            System.out.println("线程2开始");
+            if (container.size() != 5) {
+                try {
+                    latch.await();// 线程2阻塞
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("线程2结束");
+        }).start();
+
+        new Thread(() -> {
+            System.out.println("线程1开始");
+            for (int i = 0; i < 10; i++) {
+                container.add(new Object());
+                System.out.println("add" + i);
+                if (container.size() == 5) {
+                    latch.countDown();// 减一，让线程2继续执行
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+}
+
+四、Semaphore（应用场景：仅能提供有限的资源，如数据库连接数）
+Semaphore可以很容易控制某个资源可被同时访问的线程个数，提供acquire和release两个方法，acquire是获取一个许可，如果没有就等待，release是在操作完成后释放许可。Semaphore维护了当前访问的线程的个数，提供了同步机制来控制访问的个数，Semaphore可以实现有限大小的链表。
+public class SemaphoreExample1 {
+    private final static int threadCount = 20;
+
+    public static void main(String args[]) {
+        ExecutorService exec = Executors.newCachedThreadPool();
+        final Semaphore semaphore = new Semaphore(3);
+
+        for (int i = 0; i < threadCount; i++) {
+            final int threadNum = i;
+            exec.execute(() -> {
+                try {
+//                    semaphore.acquire();// 获取一个许可
+//                    test(threadNum);
+//                    semaphore.release();// 释放一个许可
+//                    if (semaphore.tryAcquire()) {// 尝试获取一个许可
+                    if (semaphore.tryAcquire(1, TimeUnit.SECONDS)) {// 尝试获取一个许可
+                        test(threadNum);
+                        semaphore.release();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        exec.shutdown();
+    }
+
+    private static void test(int threadNum) throws InterruptedException {
+        System.out.println(threadNum);
+        Thread.sleep(1000);
+    }
+}
+
+五、CyclicBarrier（应用场景：并发运算）
+	也是通过计数器实现，当某个线程调用await方法，该线程进入等待状态，且计算器加1，当计数器的值达到设置的初始值，进入等待状态的线程将会被唤醒，继续执行他们后续操作。由于CyclicBarrier在释放等待线程后可以重用，所以又称为循环屏障。

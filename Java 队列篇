@@ -1,0 +1,67 @@
+一、Java并发容器
+	ConcurrentHashMap、CopyOnWriteArrayList、CopyOnWriteSet、ConcurrentSkipListMap、ConcurrentSkipListSet、
+
+	ArrayBlockingQueue：数组结构，有界阻塞（队列头部在队列中存在时间最长）
+	PriorityBlockingQueue：支持优先级排序，无界阻塞（不会阻塞数据生产者，但是会在没有消费数据时，阻塞数据的消费者）
+	LinkedBlockingQueue：链表结构的有界阻塞队列
+	SynchronousQueue：不存储元素的阻塞队列
+	LinkedTransferQueue：链表结构的无界阻塞队列
+	LinkedBlockingDeque：链表结构的双向阻塞队列
+	ConcurrentLinkedQueue：基于链接节点的无界队列，是Queue的安全实现（FIFO）
+	ConcurrentLinkedDeque：双向链表结构的无界并发队列（FIFO/FILO）
+	DelayQueue：支持延时获取元素并且使用优先级队列的无界阻塞队列（队列中的元素必须实现Delayed接口和Comparable接口，在创建元素时可以指定多久才能从队列中获取当前元素）
+
+二、阻塞队列常用的应用场景
+	常用于生产者和消费者场景，生产者是往队列中添加元素的线程，消费者是从队列中取元素的线程。
+	阻塞队列正好是生产者存放、消费者获取的容器。
+
+三、工作窃取算法
+	是指在某个线程从其他队列里窃取任务来执行。当大任务被分割成小任务时，有的线程可能提前完成任务，此时会去帮其他没完成工作的队列。
+	为了减少竞争，通常使用双向队列，被窃取的线程从头部拿，窃取的线程从尾部拿任务执行。
+	优点是充分利用线程进行并行计算，减少线程间的竞争，缺点是当双向队列只有一个任务，也会竞争，消耗更多资源。
+
+四、处理并发的实例
+	提供并发控制：CountDownLatch、CyclicBarrier、Semaphore
+	线程间数据交换：Exchanger
+	
+	CountDownLatch：
+		允许一个或多个线程等待其他线程完成操作。
+		构造函数接受一个int类型的参数作为计数器。
+		countDown()：调用时，n会减1
+		await():调用会阻塞当前线程，直到n变为0
+		await(long time, TimeUnit unit):等待特定时间，就不会继续阻塞当前线程
+		不支持重新初始化或修改内部计数器值的功能
+	CyclicBarrier：
+		阻塞指定数量的线程，直到所有线程都被拦截就会让被拦截的线程继续运行。
+		默认构造函数需指定拦截的线程数量，每个线程调用await方法告诉CyclicBarrier已到达，然后当前线程被阻塞。
+	Semaphore：
+		用来控制同时访问资源的线程数量，通过协调各个线程，来保证合理的公共资源的访问。
+	Exchanger：
+		一个用于线程间协作的工具类，提供一个同步点，在这个同步点上，两个线程可以交换彼此的数据。
+		比如第一个线程执行exchange方法，它会一直等待第二个线程也执行exchange方法，当两个线程都到同步点，就可以交换数据了。
+		可以通过exchange设置最大等待数据，避免一直等待。
+
+五、CountDownLatch和CyclicBarrier的区别
+	前者的计数器只能使用一次，一个线程或多个等待另外n个线程完成之后才能执行。
+	后者的计数器可以通过reset方法重置，n个线程相互等待，直到所有线程都被拦截。
+
+六、线程池的好处
+	降低系统消耗：重复利用已经创建的线程降低线程创建和销毁造成的资源消耗。
+	提高相应速度：当任务到达时，任务不需要等到线程创建就可以立即执行。
+	提供线程可以管理性：可以通过设置合理分配、调优、监控。
+
+七、线程池工作流程
+	①判断核心线程池里的线程是否都有在执行任务
+	②判断工作队列是否已满
+	③判断线程池里的线程是否都在工作状态
+	④按照设置的策略来处理无法执行的任务
+
+八、设置线程池的参数
+	核心线程池大小，线程池允许创建的最大线程数、线程保存活动时间、线程保存活动时间单位、任务队列、创建线程的工厂、饱和策略（线程池满时，采取什么策略来处理）
+
+九、饱和策略
+	AbortPolicy：直接抛出异常
+	CallerRunsPolicy：调用者所在的线程来允许任务
+	DiscardOldestPolicy：丢弃队列中最近的一个任务，并执行当前任务
+	DiscardPolicy：不处理，直接丢掉
+	可以实现RejectedExecutionHandler接口自定义策略
